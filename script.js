@@ -4,7 +4,7 @@ const svg = document.querySelector('#svg');
 
 const a = [130, 60];
 const ab = [190, 30];
-const c = [150+100, 60];
+const c = [250, 60];
 const dist = 180;
 
 //Длина отрезка по координатам
@@ -34,19 +34,16 @@ console.log("angleBA", angleBA);
 
 // 1. Строим перпендикуляры до пересечения
 
-const aPath = `<path class="a-path" d="M ${a[0]} ${a[1]} L ${ab[0]} ${ab[1]}" stroke="grey" />`;
-const aPerpendicular = `<path class="a-perp" d="M ${a[0]} ${a[1]} L ${-Math.sin(angleAB) * dist + a[0]} ${(Math.cos(angleAB) * dist + a[1])}" stroke="grey" />`;
+const showPath = (start, end, cl, col) => `<path class=${cl} d="M ${start[0]} ${start[1]} L ${end[0]} ${end[1]}" stroke=${col} />`;
+const showPerpendicular = (start, len, angle, cl, col) => `<path class=${cl} d="M ${start[0]} ${start[1]} L ${-Math.sin(angle) * len + start[0]} ${(Math.cos(angle) * len + start[1])}" stroke=${col} />`;
 
-const bPath = `<path class="b-path" d="M ${ab[0]} ${ab[1]} L ${c[0]} ${c[1]}" stroke="green" />`;
-const bPerpendicular = `<path class="b-perp" d="M ${c[0]} ${c[1]} L ${-Math.sin(angleBC) * dist + c[0]} ${(Math.cos(angleBC) * dist + c[1])}" stroke="green" />`;
+const aPath = showPath(a, ab, "a-path", "grey");
+const aPerpendicular = showPerpendicular(a, dist, angleAB, "a-perp", "grey");
+
+const bPath = showPath(ab, c, "b-path", "green");
+const bPerpendicular = showPerpendicular(c, dist, angleBC, "b-perp", "green");
 
 svg.innerHTML = aPath + bPath + aPerpendicular + bPerpendicular;
-
-const apath = document.querySelector(".a-path");
-const bpath = document.querySelector(".b-path");
-
-console.log("bPath", bpath.getTotalLength());
-console.log("aPath", apath.getTotalLength());
 
 // 2. Находим координату точки пересечения перпендикуляров и радиус дуги
 
@@ -86,9 +83,9 @@ let o = intersect(a[0], a[1], (-Math.sin(angleAB) * dist + a[0]), (Math.cos(angl
 
 console.log(o);
 
-
 // let dt1 = Math.sqrt((x2-x1)**2+(y2-y1)**2);
-let dt = Math.sqrt((o[0]-a[0])**2+(o[1]-a[1])**2);
+// let dt = Math.sqrt((o[0]-a[0])**2+(o[1]-a[1])**2);
+let dt = Math.hypot((o[0]-a[0]),(o[1]-a[1]));
 
 console.log(dt);
 
@@ -111,3 +108,27 @@ const points = (arr, angle) => {
 
 console.log(points(a, angleAB));
 console.log(points(c, angleBC));
+
+//------------------
+//==================
+const e = [50, 400];
+const d = [400, 550];
+
+const pathDE = showPath(d, e, "d-path", "teal");
+
+svg.innerHTML += pathDE;
+
+function getPerpOfLine(x1,y1,x2,y2){ // the two points can not be the same
+	var nx = x2 - x1;  // as vector
+	var ny = y2 - y1;
+	const len = Math.sqrt(nx * nx + ny * ny);  // length of line
+	nx /= len;  // make one unit long
+	ny /= len;  // which we call normalising a vector
+	return [-ny * 50, nx * 50]; // return the normal  rotated 90 deg
+}
+
+console.log(getPerpOfLine(d[0], d[1], e[0], e[1]));
+
+const perpDE = showPath(e, getPerpOfLine(d[0], d[1], e[0], e[1]), "d-perp", "orange");
+
+svg.innerHTML += perpDE;
